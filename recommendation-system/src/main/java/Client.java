@@ -18,7 +18,8 @@ public class Client {
         String hostname = "127.0.0.1";
         int port = Integer.parseInt("6666");
         ObjectMapper mapper = new ObjectMapper();
-        Recommender recommender = RecommenderManufacture.createFullGraphRecommender();
+        Recommender recommender = RecommenderManufacture.createSubgraphRecommender();
+//        Recommender recommender = RecommenderManufacture.createFullGraphRecommender();
         DatabaseUpdater updater = new DatabaseUpdater(0.1);
         updater.initialize();
         TypeReference<HashMap<String, Object>> typeRef

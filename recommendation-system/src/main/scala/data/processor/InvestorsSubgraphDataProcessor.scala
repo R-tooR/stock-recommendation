@@ -12,13 +12,18 @@ class InvestorsSubgraphDataProcessor extends DataProcessor {
   def get(dfs: List[DataFrame]): Either[String, List[Iterable[Iterable[Double]]]] = {
 
     def getInvestorStocks(df: sql.DataFrame, target: sql.DataFrame) = Try {
-      val companiesList = df.select(GetInvestorsQuery.companiesNamesList).collectAsList()
-      val theirCompaniesMap = df.select(GetInvestorsQuery.theirCompaniesMap).collectAsList()
-      val targetCompaniesMap = target.select(GetTargetInvestorQuery.targetInvestorCompanies).collectAsList()
-      val allTheirCompanies = (theirCompaniesMap zip companiesList map(r => r._1.getList(0).toIterable ++ r._2.getList(0).toIterable))
-      val allTargetCompanies = (targetCompaniesMap map(r => r.getList(0).toIterable))
+      val companiesList = df.select(GetInvestorsQuery.companiesNamesList).collect().toList.map(_.get(0)).map(l => l.asInstanceOf[Seq[Nothing]])
+//      val companiesList = df.select(GetInvestorsQuery.companiesNamesList).collectAsList()
+      val theirCompaniesMap = df.select(GetInvestorsQuery.theirCompaniesMap).collect().toList.map(_.get(0)).map(l => l.asInstanceOf[Seq[Nothing]])
+//      val theirCompaniesMap = df.select(GetInvestorsQuery.theirCompaniesMap).collectAsList()
+      val targetCompaniesMap = target.select(GetTargetInvestorQuery.targetInvestorCompanies).collect().toList.map(_.get(0)).map(l => l.asInstanceOf[Seq[Nothing]])
+      val allTheirCompanies = (theirCompaniesMap zip companiesList map(r => r._1 ++: r._2))
+//      val allTheirCompanies = (theirCompaniesMap zip companiesList map(r => r._1.getList(0).toIterable ++ r._2.getList(0).toIterable))
+      val allTargetCompanies = (targetCompaniesMap)
+//      val allTargetCompanies = (targetCompaniesMap map(r => r.getList(0).toIterable))
       val allCompanies = allTargetCompanies ++ allTheirCompanies
-      (allCompanies map(r => r.toSet)).toList
+      (allCompanies map(r => r.toSet))
+//      (allCompanies map(r => r.toSet)).toList
     }
 
     def getInvestorCategories(df: sql.DataFrame, target: sql.DataFrame) = Try {
